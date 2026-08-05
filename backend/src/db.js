@@ -4,7 +4,9 @@ const fs = require('fs');
 const Database = require('better-sqlite3');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const DB_PATH = path.join(DATA_DIR, 'cx_dashboard.db');
+// Defaults to the committed demo database. A host can point elsewhere (e.g. a
+// persistent volume) by setting DB_PATH.
+const DB_PATH = process.env.DB_PATH || path.join(DATA_DIR, 'cx_dashboard.db');
 
 let _db = null;
 

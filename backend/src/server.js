@@ -1,5 +1,7 @@
 'use strict';
-require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const express = require('express');
 const cors = require('cors');
 const { runMigrations } = require('./db');
@@ -11,10 +13,12 @@ const pipelineRouter = require('./routes/pipeline');
 const exportRouter = require('./routes/export');
 
 const app = express();
-// Hardcoded: the dev-server harness injects a PORT env var for the frontend's
-// port (5173), which would otherwise collide since concurrently shares env
-// between the backend and frontend child processes.
-const PORT = 3001;
+// The local dev harness shares env between the backend and frontend child
+// processes and injects PORT=5173 (the frontend's port); binding the backend to
+// that would collide. So ignore that one specific value, but honour any other
+// PORT — which is how hosts like Railway tell us the port to bind in production.
+const envPort = parseInt(process.env.PORT, 10);
+const PORT = envPort && envPort !== 5173 ? envPort : 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -32,6 +36,22 @@ app.use('/api/export', exportRouter);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// In production the same service serves the built React app. When frontend/dist
+// exists (created by `npm run build`), serve it and fall back to index.html for
+// client-side routes. In local dev the dist folder is absent and Vite serves the
+// frontend on :5173, so this block is simply skipped.
+const distDir = path.join(__dirname, '../../frontend/dist');
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.join(distDir, 'index.html'));
+    }
+    next();
+  });
+  console.log('[server] Serving built frontend from frontend/dist');
+}
 
 app.listen(PORT, () => {
   console.log(`\n🚀  CX Dashboard API running at http://localhost:${PORT}`);

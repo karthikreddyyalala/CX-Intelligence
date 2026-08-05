@@ -5,7 +5,9 @@
   "workspaces": ["backend", "frontend"],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
-    "start": "concurrently \"npm run start --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspace=frontend",
+    "start": "node backend/src/server.js",
+    "start:dev": "concurrently \"npm run start --workspace=backend\" \"npm run dev --workspace=frontend\"",
     "install:all": "npm install"
   },
   "devDependencies": {
