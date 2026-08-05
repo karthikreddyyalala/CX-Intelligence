@@ -1,0 +1,255 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   CX INTELLIGENCE — "Signal" design system
+   Intelligence-terminal aesthetic · amber signal accent · hairline layout
+   ───────────────────────────────────────────────────────────── */
+
+@layer base {
+  :root {
+    /* Light — warm paper */
+    --bg:          #f4f2ec;
+    --bg-elev:     #faf9f5;
+    --surface:     #ffffff;
+    --border:      #e6e1d5;
+    --border-2:    #d9d3c4;
+    --text:        #161519;
+    --text-dim:    #6a675f;
+    --text-faint:  #9d998e;
+    --accent:      #b3781f;
+    --accent-soft: rgba(179,120,31,0.10);
+    --pos:         #0e9f6e;
+    --neg:         #d83a3f;
+    --neu:         #98948b;
+    --grid:        rgba(0,0,0,0.05);
+    --shadow:      0 1px 2px rgba(30,25,15,0.05), 0 12px 32px -14px rgba(30,25,15,0.14);
+  }
+  html.dark {
+    /* Dark — warm obsidian */
+    --bg:          #0a0a0c;
+    --bg-elev:     #101014;
+    --surface:     #14141a;
+    --border:      #23232d;
+    --border-2:    #31313d;
+    --text:        #f4f2ee;
+    --text-dim:    #908d99;
+    --text-faint:  #5c5a67;
+    --accent:      #e0a03a;
+    --accent-soft: rgba(224,160,58,0.12);
+    --pos:         #34d399;
+    --neg:         #fb6f75;
+    --neu:         #7c7986;
+    --grid:        rgba(255,255,255,0.04);
+    --shadow:      0 1px 2px rgba(0,0,0,0.4), 0 24px 48px -20px rgba(0,0,0,0.7);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Geist', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background 0.4s ease, color 0.4s ease;
+    font-feature-settings: 'cv01','ss01';
+  }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; border: 2px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); background-clip: padding-box; }
+
+  h1,h2,h3 { font-family: '"Bricolage Grotesque"', 'Bricolage Grotesque', sans-serif; }
+}
+
+@layer components {
+  /* Eyebrow / section label */
+  .eyebrow {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+  .num {
+    font-family: 'Geist Mono', monospace;
+    /* Tabular + slashed zero: figures align in columns and 0/O never read alike —
+       the convention in financial and enterprise reporting UIs. */
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
+
+  /* Large headline figures: optically tightened so big numbers read as one unit
+     rather than spaced-out digits. */
+  .metric {
+    font-family: 'Geist Mono', monospace;
+    font-feature-settings: 'tnum' 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    line-height: 0.95;
+  }
+  /* Currency mark set smaller and raised — standard typographic treatment for
+     financial figures, keeps the digits dominant. */
+  .metric .cur {
+    font-size: 0.56em;
+    font-weight: 600;
+    vertical-align: 0.32em;
+    margin-right: 0.08em;
+    opacity: 0.75;
+    letter-spacing: 0;
+  }
+
+  /* Surfaces */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+  }
+  .panel-quiet {
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+  }
+  .hair { border-color: var(--border); }
+
+  /* Interactive tile (platform cards, review cards) */
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    transition: border-color .25s ease, transform .25s cubic-bezier(0.16,1,0.3,1), box-shadow .25s ease;
+  }
+  .tile-hover:hover {
+    border-color: var(--border-2);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .tile-hover:active { transform: translateY(0) scale(0.995); }
+
+  /* Buttons */
+  .btn-signal {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-weight: 600; font-size: 0.86rem;
+    padding: 0.62rem 1.05rem; border-radius: 13px;
+    color: #17130a; background: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 80%, #000);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 8px 20px -10px var(--accent);
+    transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+    user-select: none; cursor: pointer;
+  }
+  .btn-signal:hover:not(:disabled) { filter: brightness(1.06); box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 10px 26px -8px var(--accent); }
+  .btn-signal:active:not(:disabled) { transform: translateY(1px) scale(0.98); }
+  .btn-signal:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .btn-quiet {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    font-weight: 500; font-size: 0.82rem;
+    padding: 0.5rem 0.85rem; border-radius: 12px;
+    color: var(--text-dim); background: transparent;
+    border: 1px solid var(--border);
+    transition: all .15s ease; user-select: none; cursor: pointer;
+  }
+  .btn-quiet:hover:not(:disabled) { color: var(--text); border-color: var(--border-2); background: var(--accent-soft); }
+  .btn-quiet:active:not(:disabled) { transform: scale(0.98); }
+  .btn-quiet:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Inputs */
+  .field {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.85rem;
+    transition: border-color .15s ease, box-shadow .15s ease;
+    outline: none;
+  }
+  .field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .field::placeholder { color: var(--text-faint); }
+
+  /* Sentiment badges */
+  .badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; font-weight: 600; padding: 0.18rem 0.55rem; border-radius: 99px; border: 1px solid; letter-spacing: 0.01em; }
+  .badge-pos { color: var(--pos); border-color: color-mix(in srgb, var(--pos) 35%, transparent); background: color-mix(in srgb, var(--pos) 12%, transparent); }
+  .badge-neg { color: var(--neg); border-color: color-mix(in srgb, var(--neg) 35%, transparent); background: color-mix(in srgb, var(--neg) 12%, transparent); }
+  .badge-neu { color: var(--neu); border-color: color-mix(in srgb, var(--neu) 35%, transparent); background: color-mix(in srgb, var(--neu) 12%, transparent); }
+
+  /* Topic chip */
+  .chip {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.68rem;
+    padding: 0.2rem 0.55rem; border-radius: 8px;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    color: var(--text-dim);
+    transition: all .15s ease; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+}
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes ping-ring { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.4); opacity: 0; } }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes float-y { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+.animate-fade-in  { animation: fadeIn 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-fade-up  { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-scale-in { animation: scaleIn 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+.spin { animation: spin 0.9s linear infinite; }
+
+/* Staggered reveal for grids/lists */
+.stagger > * { animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger > *:nth-child(2) { animation-delay: 0.09s; }
+.stagger > *:nth-child(3) { animation-delay: 0.14s; }
+.stagger > *:nth-child(4) { animation-delay: 0.19s; }
+.stagger > *:nth-child(5) { animation-delay: 0.24s; }
+.stagger > *:nth-child(6) { animation-delay: 0.29s; }
+.stagger > *:nth-child(7) { animation-delay: 0.34s; }
+.stagger > *:nth-child(n+8) { animation-delay: 0.38s; }
+
+/* Live dot with expanding ring */
+.live-dot { position: relative; }
+.live-dot::after {
+  content: ''; position: absolute; inset: 0; border-radius: 99px;
+  border: 1px solid currentColor; animation: ping-ring 2s cubic-bezier(0,0,0.2,1) infinite;
+}
+
+/* Shimmer skeleton */
+.shimmer {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--bg-elev) 50%, var(--surface) 75%);
+  background-size: 200% 100%; animation: shimmer 1.6s infinite;
+}
+
+/* Header signal sweep */
+.sweep-line { position: relative; overflow: hidden; }
+.sweep-line::after {
+  content: ''; position: absolute; inset: 0; width: 40%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.5; animation: sweep 3.5s linear infinite;
+}
+
+/* Fixed grain/scanline atmosphere (pointer-events none, no repaint on scroll) */
+.atmosphere {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(120% 80% at 100% 0%, var(--accent-soft), transparent 45%),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 100% 100%, 46px 46px, 46px 46px;
+  opacity: 0.9;
+  mask-image: radial-gradient(120% 100% at 50% 0%, #000 30%, transparent 90%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, .stagger > *, .sweep-line::after, .live-dot::after, .shimmer { animation: none !important; transition: none !important; }
+}

@@ -1,0 +1,34 @@
+# ─── Secrets — NEVER commit ────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ─── Databases & their sidecar/backup files ────────────────
+# NOTE: plain "*.db" misses SQLite's WAL/SHM and dated backups,
+# so each variant is listed explicitly.
+*.db
+*.db-wal
+*.db-shm
+*.db.bak-*
+*.bak-*
+*.sqlite
+*.sqlite3
+backend/data/
+
+# ─── Dependencies & build output ───────────────────────────
+node_modules/
+dist/
+build/
+.vite/
+
+# ─── Generated / scratch ───────────────────────────────────
+reviews-output.json
+history/
+*.log
+
+# ─── OS / editor cruft ─────────────────────────────────────
+.DS_Store
+.idea/
+*.swp
