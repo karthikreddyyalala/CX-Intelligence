@@ -1,19 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, LifeBuoy, Quote, ExternalLink, Users } from 'lucide-react';
-
-/**
- * Staff named in customer reviews, split into recognition and coaching.
- *
- * Handled deliberately: these are names customers wrote in public reviews, and
- * a complaint is a signal to look into, never a verdict on an employee. The UI
- * always shows the verbatim behind a count and links to the source review, so
- * nobody is ever judged on an aggregate alone.
- */
-
-const TABS = [
-  { key: 'recognition', label: 'Praised', icon: Award, tone: 'var(--pos)' },
-  { key: 'coaching', label: 'Complaints', icon: LifeBuoy, tone: 'var(--neg)' },
-];
+import { Award, Quote, ExternalLink, Users } from 'lucide-react';
 
 function QuoteLine({ q }) {
   return (
@@ -75,7 +61,6 @@ function PersonRow({ p, tone, expanded, onToggle }) {
 export default function PeopleIntel() {
   const [d, setD] = useState(null);
   const [err, setErr] = useState('');
-  const [tab, setTab] = useState('recognition');
   const [open, setOpen] = useState(null);
   const [showAll, setShowAll] = useState(false);
 
@@ -89,41 +74,20 @@ export default function PeopleIntel() {
   if (err) return null;
   if (!d) return <div className="panel h-64 shimmer" />;
 
-  const active = TABS.find(t => t.key === tab);
-  const list = d[tab] || [];
+  const list = d.recognition || [];
   const visible = showAll ? list : list.slice(0, 8);
 
   return (
     <div className="panel p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
-        <div className="flex items-center gap-2.5">
-          <span className="flex items-center justify-center w-9 h-9 rounded-xl" style={{ background: 'var(--accent-soft)' }}>
-            <Users size={17} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />
-          </span>
-          <div>
-            <p className="font-display font-bold text-[15px]" style={{ color: 'var(--text)' }}>The people customers name</p>
-            <p className="eyebrow mt-0.5">
-              <span className="num">{d.peopleNamed}</span> staff named across <span className="num">{d.reviewsNamingSomeone}</span> reviews
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-1.5">
-          {TABS.map(t => {
-            const on = tab === t.key;
-            return (
-              <button key={t.key} onClick={() => { setTab(t.key); setOpen(null); setShowAll(false); }}
-                className="chip flex items-center gap-1.5" style={{
-                  fontSize: '0.72rem',
-                  borderColor: on ? t.tone : undefined,
-                  color: on ? t.tone : undefined,
-                  background: on ? 'var(--bg-elev)' : undefined,
-                }}>
-                <t.icon size={12} strokeWidth={1.75} />
-                {t.label}
-                <span className="num" style={{ color: 'var(--text-faint)' }}>{(d[t.key] || []).length}</span>
-              </button>
-            );
-          })}
+      <div className="flex items-center gap-2.5 mb-5">
+        <span className="flex items-center justify-center w-9 h-9 rounded-xl" style={{ background: 'var(--accent-soft)' }}>
+          <Users size={17} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />
+        </span>
+        <div>
+          <p className="font-display font-bold text-[15px]" style={{ color: 'var(--text)' }}>Staff customers praised by name</p>
+          <p className="eyebrow mt-0.5">
+            <span className="num">{list.length}</span> people named across <span className="num">{d.reviewsNamingSomeone}</span> reviews
+          </p>
         </div>
       </div>
 
@@ -131,7 +95,7 @@ export default function PeopleIntel() {
         <>
           <div>
             {visible.map(p => (
-              <PersonRow key={p.name} p={p} tone={active.tone}
+              <PersonRow key={p.name} p={p} tone="var(--pos)"
                 expanded={open === p.name}
                 onToggle={() => setOpen(open === p.name ? null : p.name)} />
             ))}
@@ -144,24 +108,10 @@ export default function PeopleIntel() {
         </>
       ) : (
         <div className="py-10 text-center">
-          <p className="text-[13px] font-semibold" style={{ color: 'var(--text-dim)' }}>
-            {tab === 'coaching' ? 'Nobody was named in a complaint.' : 'Nobody was named in praise yet.'}
-          </p>
-          <p className="text-[12px] mt-1" style={{ color: 'var(--text-faint)' }}>
-            {tab === 'coaching'
-              ? 'Customers who complained described the process, not a person.'
-              : 'Named praise appears here as reviews accumulate.'}
-          </p>
+          <p className="text-[13px] font-semibold" style={{ color: 'var(--text-dim)' }}>Nobody was named in praise yet.</p>
+          <p className="text-[12px] mt-1" style={{ color: 'var(--text-faint)' }}>Named praise appears here as reviews accumulate.</p>
         </div>
       )}
-
-      <p className="text-[11.5px] leading-relaxed mt-5 pt-4"
-        style={{ color: 'var(--text-faint)', borderTop: '1px solid var(--border)' }}>
-        Names are extracted by Claude only where a customer clearly identified the person who served
-        them; every count opens to the exact sentence and links to the original review. Treat a
-        complaint as a prompt to look into a shift, not a judgement on an employee — first names are
-        not unique, and one review is one customer&rsquo;s account.
-      </p>
     </div>
   );
 }
