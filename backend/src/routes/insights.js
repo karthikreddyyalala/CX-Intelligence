@@ -7,6 +7,7 @@ const { getRiskBasis } = require('../riskBasis');
 const { getDigest } = require('../digest');
 const { getLocations, getPeople, getLocationThemes } = require('../segments');
 const { getIdentityClusters } = require('../identity');
+const { getDisputes } = require('../disputes');
 const router = express.Router();
 
 // Only whitelisted windows and sources — keeps labels honest, queries
@@ -224,6 +225,16 @@ router.get('/source-ratings', (req, res) => {
     });
 
     res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// GET /api/disputes — public billing disputes ranked by escalation risk.
+router.get('/disputes', (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 60, 200);
+    res.json(getDisputes({ limit }));
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

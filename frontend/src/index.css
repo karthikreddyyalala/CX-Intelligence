@@ -4,7 +4,7 @@
 
 /* ─────────────────────────────────────────────────────────────
    CX INTELLIGENCE — "Signal" design system
-   Intelligence-terminal aesthetic · amber signal accent · hairline layout
+   Intelligence-terminal aesthetic · Avis red signal accent · hairline layout
    ───────────────────────────────────────────────────────────── */
 
 @layer base {
@@ -18,8 +18,8 @@
     --text:        #161519;
     --text-dim:    #6a675f;
     --text-faint:  #9d998e;
-    --accent:      #b3781f;
-    --accent-soft: rgba(179,120,31,0.10);
+    --accent:      #b06a12;
+    --accent-soft: rgba(176,106,18,0.10);
     --pos:         #0e9f6e;
     --neg:         #d83a3f;
     --neu:         #98948b;
@@ -36,8 +36,8 @@
     --text:        #f4f2ee;
     --text-dim:    #908d99;
     --text-faint:  #5c5a67;
-    --accent:      #e0a03a;
-    --accent-soft: rgba(224,160,58,0.12);
+    --accent:      #f2b24a;
+    --accent-soft: rgba(242,178,74,0.13);
     --pos:         #34d399;
     --neg:         #fb6f75;
     --neu:         #7c7986;
