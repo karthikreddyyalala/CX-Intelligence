@@ -11,7 +11,6 @@ import ExecDigest from './components/ExecDigest';
 import ResponseRate from './components/ResponseRate';
 import LocationIntel from './components/LocationIntel';
 import LocationThemes from './components/LocationThemes';
-import PeopleIntel from './components/PeopleIntel';
 import IdentityIntel from './components/IdentityIntel';
 import IdentityFlowModal from './components/IdentityFlowModal';
 import AskPanel from './components/AskPanel';
@@ -278,13 +277,6 @@ export default function App() {
           <div className="mt-6">
             <LocationThemes />
           </div>
-        </section>
-
-        {/* Staff named in reviews */}
-        <section>
-          <SectionLabel eyebrow="08 — People intelligence" title="The names customers keep repeating"
-            sub="Staff customers called out by name — who is winning the brand goodwill, and where a shift needs a closer look. Every count opens to the exact review." />
-          <PeopleIntel />
         </section>
 
         {/* Duplicate reviewer detection */}
