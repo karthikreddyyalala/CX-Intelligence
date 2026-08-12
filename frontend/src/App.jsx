@@ -112,7 +112,7 @@ function RunOverlay({ stage }) {
 
 // ── Main ───────────────────────────────────────────────────────────
 export default function App() {
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(false);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [running, setRunning] = useState(false);
   const [stage, setStage] = useState(0);
