@@ -3,6 +3,7 @@ import {
   RefreshCw, Sun, Moon, X, CheckCircle2, AlertCircle, Radar,
   ArrowUpRight, ArrowDownRight, Sparkles, GitCompare,
 } from 'lucide-react';
+import PeopleIntel from './components/PeopleIntel';
 import KPIPanel from './components/KPIPanel';
 import DisputeRadar from './components/DisputeRadar';
 import DataConfidence from './components/DataConfidence';
@@ -277,6 +278,13 @@ export default function App() {
           <div className="mt-6">
             <LocationThemes />
           </div>
+        </section>
+
+        {/* Staff praised in reviews */}
+        <section>
+          <SectionLabel eyebrow="08 — People intelligence" title="Staff customers praised by name"
+            sub="Customers who called out someone by name for great service — who is winning goodwill for the brand. Every count opens to the exact review." />
+          <PeopleIntel />
         </section>
 
         {/* Duplicate reviewer detection */}
