@@ -1,165 +1,108 @@
-# CX Intelligence
+# CX Intelligence Dashboard
 
-An AI-powered customer-experience intelligence platform for Avis car rental. It
-collects public reviews from five platforms, analyses every one with AI, and
-turns 1,800+ scattered reviews into decisions a Customer Experience team can act
-on — **by branch, by employee, and by customer identity.**
-
-Most review dashboards tell you *what* customers said. This one also tells you
-*where* they said it, *who* they praised or blamed, and *whether two angry
-reviews are secretly the same person.*
+**Live demo:** https://cx-dashboard-backend-production.up.railway.app
 
 ---
 
-## What it does
+## What this is
 
-| Module | Question it answers |
-|--------|--------------------|
-| **Platform Intelligence** | How is the brand doing across Google, Trustpilot, App Store, Play Store, Reddit? |
-| **Pain Points** | What are customers actually complaining about, ranked by impact? |
-| **Revenue at Risk** | What is poor CX costing us, in dollars? |
-| **Location Intelligence** | Which of our 30 branches need help, worst-first? |
-| **Branch vs Policy heatmap** | Is a complaint a *local* problem (send someone) or a *company-wide* one (fix the policy)? |
-| **People Intelligence** | Which employees do customers praise by name? Which are named in complaints? |
-| **Identity Intelligence** | If one angry customer posts under different names on different platforms, can we detect it? |
+During my AI Enablement internship at Avis Budget Group, I noticed something that kept bothering me. The company tracks customer satisfaction through internal surveys, but most unhappy customers never fill out those surveys. They go straight to Google, Trustpilot, the App Store, and Reddit and write public reviews instead. That signal was sitting in the open and nobody was reading it systematically.
+
+So I built this on my own initiative, outside of my assigned tasks, to show what was possible if you actually read that data.
+
+This is a proof-of-concept dashboard that collects public reviews from five platforms, runs them through AI analysis, and turns 1,600+ scattered reviews into something a CX team can actually act on. It answers questions like: which branch is getting the worst reviews, which employees are customers praising by name, and which complaints are likely to turn into chargebacks.
+
+The data is real. Every number you see is counted from actual customer reviews scraped from public sources. Nothing is estimated or made up.
 
 ---
 
-## Identity Intelligence — how it works
+## What it shows
 
-The standout feature. Public review sites have no login we can see, so we can
-never be *certain* two reviews are the same person. Instead the system gathers
-**signals**, scores them, and asks an AI to make the final call — always showing
-its evidence.
+**Executive Pulse**
+A single view of brand health across all five platforms: Google Maps, Trustpilot, App Store, Google Play, and Reddit. Sentiment breakdown, total review count, and the newest review date.
 
-### Layer 1 — Signal detection (pure code, no AI, instant)
+**Dispute Radar**
+This is the part I am most proud of. I built a detector that reads the text of every complaint and finds the ones where a customer named a specific dollar amount they are disputing. It then scores each one by how likely it is to escalate into a chargeback, a BBB case, or legal action, using signals like whether the customer mentioned "Chase Bank", "lawsuit", or "filing a dispute". The result is a ranked worklist of 63 complaints totaling $20,513 in disputed charges, sorted from most critical to least. Some of those reviews even include the customer's booking reference number, which means any analyst with system access could look that rental up immediately and call the customer before the chargeback hits.
 
-Four independent detectors run over the review corpus:
+**Pain Points**
+The recurring complaints ranked by how negative and how frequent they are. This is your fix-first list.
 
-- **Same incident** — different names, near-identical story. Uses **TF-IDF +
-  cosine similarity** (see below).
-- **Multi-branch** — one name reviewing several branches within a few days
-  (one bad day bouncing a customer between locations).
-- **Rating burst** — one name spraying empty star ratings across branches in a
-  week with no text: a ratings-inflation campaign, not a customer journey.
-- **Cross-platform** — the same name appearing on more than one platform.
+**Revenue at Risk**
+A calculator that translates complaint volume into dollars. The logic comes from a well-known consumer affairs statistic: for every customer who complains, roughly 26 others have the same experience and say nothing. You enter your own assumption for what a customer is worth and every figure updates.
 
-### The algorithm — TF-IDF + cosine similarity
+**Location Intelligence**
+All 30 branches ranked worst-first by their review scores. You can click any branch and see the exact complaints behind its score.
 
-**TF-IDF** = *Term Frequency × Inverse Document Frequency.* It is a numerical
-statistic that measures how *important* a word is to one review, relative to all
-reviews.
+**People Intelligence**
+Customers often name specific employees in their reviews, both in praise and in complaints. This section surfaces the staff who are getting called out by name for great service.
 
-- A word like **"the"** appears in almost every review → its weight is ~0. It
-  tells us nothing.
-- A phrase like **"half-tank fuel rule"** appears in only a couple of reviews →
-  its weight is very high. It is highly distinctive.
+**Identity Intelligence**
+One angry customer can post on every platform under a different name and make one bad experience look like four separate complaints. This feature detects likely duplicates using TF-IDF and cosine similarity to find reviews that describe the same incident in the same language, then asks Claude to verify the match and explain its reasoning. It keeps the numbers honest.
 
-Each review becomes a vector of these weighted words. We then compute **cosine
-similarity** — the angle between two vectors. Angle near 0° → the reviews use
-the same distinctive language → probably the same incident. We flag pairs above
-28% similarity that *also* share a branch or a date, because similar wording
-alone is weak (angry customers reuse phrases) and only becomes meaningful when
-combined with shared circumstance.
-
-> TF-IDF is a 50-year-old, industry-standard technique — the same maths behind
-> search engines and plagiarism detectors.
-
-### Layer 2 — AI verification (Claude)
-
-Only the strongest clusters are sent to the model, which reads the actual review
-text and returns a verdict (`same-person` / `same-incident` / `unrelated` /
-`unclear`), a confidence score, and its reasoning. The model is instructed to be
-skeptical: a shared complaint *type* is not evidence; a shared specific *detail*
-is.
-
-### Layer 3 — Storage
-
-Verdicts are cached in an `identity_verdicts` table keyed by a stable cluster
-hash, so the dashboard reads instantly and the model is never asked the same
-question twice.
-
-**The result:** three reviews under three different names, on three different
-platforms, that mention the same branch, same week, and same unusual detail get
-surfaced as *one customer, one incident* — with a confidence score and the
-quotes that prove it.
+**Ask Anything**
+A plain-English interface where you can type any question about the reviews and Claude answers from the actual data with quotes.
 
 ---
 
-## Architecture
+## How it works technically
 
 ```
- Google Maps ─┐
- Trustpilot  ─┤
- App Store   ─┼─► Scrapers (Apify) ─► SQLite ─► AI Analysis (Claude) ─► REST API ─► React dashboard
- Play Store  ─┤                                  (sentiment, themes,
- Reddit      ─┘                                   employees, identity)
+Google Maps
+Trustpilot
+App Store    -->  Apify scrapers  -->  SQLite  -->  Claude AI analysis  -->  REST API  -->  React dashboard
+Google Play
+Reddit
 ```
 
-- **Scraping** — [Apify](https://apify.com) actors for Google Maps, Trustpilot,
-  Play Store, Reddit; Apple's free RSS feed for the App Store (no credits).
-- **AI** — Anthropic Claude (Haiku) for sentiment, theme tagging, employee-name
-  extraction, and identity verification.
-- **Everything shown is *counted* from real reviews.** Financial figures use
-  assumptions entered in the UI — nothing is invented.
+Each review goes through Claude for sentiment scoring, theme tagging, and employee name extraction. The identity resolution layer runs TF-IDF cosine similarity across the full corpus and passes the strongest clusters to Claude for a final verdict.
 
-## Tech stack
+**Tech stack:**
 
-- **Frontend** — React 18, Vite, Tailwind CSS, Recharts, Lucide icons
-- **Backend** — Node.js, Express, better-sqlite3
-- **AI** — Anthropic Claude via `@anthropic-ai/sdk`
-- **Scraping** — Apify (`apify-client`)
+- Frontend: React 18, Vite, Tailwind CSS, Recharts, Lucide icons
+- Backend: Node.js, Express, better-sqlite3
+- AI: Anthropic Claude via the official SDK
+- Scraping: Apify actors for Google Maps, Trustpilot, Play Store, and Reddit. Apple App Store uses the free RSS feed.
 
 ---
 
-## Running locally
+## Running it locally
 
-**Prerequisites:** Node.js 18+, an Apify token, and an Anthropic API key.
+You need Node.js 18+, an Apify token, and an Anthropic API key.
 
 ```bash
-# 1. Install dependencies (root, backend, frontend via workspaces)
 npm install
 
-# 2. Configure secrets
 cp .env.example .env
-#    then edit .env and paste in your real APIFY_TOKEN and ANTHROPIC_API_KEY
+# Add your APIFY_TOKEN and ANTHROPIC_API_KEY to the .env file
 
-# 3. Start both servers (backend :3001, frontend :5173)
 npm run dev
 ```
 
 Open http://localhost:5173.
 
-### Populating data
-
-The SQLite database is **not** committed (it is git-ignored). To fill it:
+The SQLite database is not committed to git. To fill it with data:
 
 ```bash
-# Scrape fresh reviews from all live sources
 node backend/src/scraper.js
-
-# Run AI analysis (sentiment, themes, employee names)
 node backend/src/analyzer.js
 ```
+
+---
+
+## Why I built this
+
+I wanted to show that the information a company needs to fix its customer experience problems is almost always already public. Customers are writing it out in detail, with booking references and dollar amounts, on platforms the company owns accounts on. The gap is not data, it is a system that reads it.
+
+This is a POC built to prove that point. The analysis is real, the reviews are real, and the disputes are real. It is not connected to any internal Avis system and was built entirely with public data and my own time.
 
 ---
 
 ## Environment variables
 
 | Variable | Purpose |
-|----------|---------|
-| `APIFY_TOKEN` | Authenticates the Apify review scrapers |
-| `ANTHROPIC_API_KEY` | Authenticates Claude for AI analysis |
-| `PORT` | Backend port (default `3001`) |
+|---|---|
+| APIFY_TOKEN | Authenticates the Apify review scrapers |
+| ANTHROPIC_API_KEY | Authenticates Claude for AI analysis |
+| PORT | Backend port, defaults to 3001 |
 
-> **Security:** `.env` is git-ignored and must never be committed. In production,
-> set these as server environment variables in your host's dashboard, never in
-> code.
-
----
-
-## Project status
-
-Built as an internship project and continuing under active development. Next on
-the roadmap: Sprout Social integration (social mentions), competitor
-benchmarking (Hertz / Enterprise / Budget), and a weekly email briefing.
+The .env file is git-ignored and must never be committed.
