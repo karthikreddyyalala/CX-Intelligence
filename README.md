@@ -6,9 +6,9 @@
 
 ## What this is
 
-During my AI Enablement internship at Avis Budget Group, I noticed something that kept bothering me. The company tracks customer satisfaction through internal surveys, but most unhappy customers never fill out those surveys. They go straight to Google, Trustpilot, the App Store, and Reddit and write public reviews instead. That signal was sitting in the open and nobody was reading it systematically.
+During my AI Enablement internship at Avis Budget Group, I thought it would be useful to show the team what we could do with the public customer feedback that already exists across Google, Trustpilot, the App Store, and Reddit. Customers are writing detailed reviews on these platforms every day and I wanted to explore how we could turn that into something actionable for the CX team.
 
-So I built this on my own initiative, outside of my assigned tasks, to show what was possible if you actually read that data.
+So I built this as a personal initiative to show a concrete example of what that could look like.
 
 This is a proof-of-concept dashboard that collects public reviews from five platforms, runs them through AI analysis, and turns 1,600+ scattered reviews into something a CX team can actually act on. It answers questions like: which branch is getting the worst reviews, which employees are customers praising by name, and which complaints are likely to turn into chargebacks.
 
